@@ -1,6 +1,6 @@
 [submodule "api"]
   path = api
-  url = ...
+  url = https://github.com/web-novice-tech/api_nuxtspa-railsapi
 [submodule "front"]
   path = front
-  url = ...
+  url = https://github.com/web-novice-tech/front_nuxtspa-railsapi
