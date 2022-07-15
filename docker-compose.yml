@@ -1,0 +1,44 @@
+# Doc: https://docs.docker.jp/compose/compose-file/compose-versioning.html
+version: "3.8"
+
+# サービス = コンテナ
+services:
+  db:
+    # 既存のベースイメージを指定
+    image: postgres:13.7-alpine
+    environment:
+      TZ: UTC
+      PGTZ: UTC
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    # ホストパス(絶対or相対):コンテナパス(絶対)
+    volumes:
+      - "./api/tmp/db:/var/lib/postgresql/data"
+
+  api:
+    # ベースイメージとなるDockerfileを指定
+    build:
+      context: ./api
+      args:
+        WORKDIR: $WORKDIR
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - "./api:/$WORKDIR"
+    depends_on:
+      - db
+    ports:
+      - "$API_PORT:3000"
+
+  front:
+    build:
+      context: ./front
+      args:
+        WORKDIR: $WORKDIR
+    # コンテナで実行したいコマンド(DockerfileのCMD)
+    command: yarn run dev
+    volumes:
+      - "./front:/$WORKDIR"
+    ports:
+      - "$FRONT_PORT:3000"
+    depends_on:
+      - api
